@@ -1,63 +1,70 @@
 const express = require("express");
 
+const {uuid} = require("uuidv4");
+
 const app = express();
 
 app.use(express.json());
 
+const projects = [];
+
 app.get('/projects', (req, resp) => {
 
-    const query = req.query;
+    const { title } = req.query;
 
-    console.log(query);
+    const result = title ? projects.filter(p => p.title.includes(title)) : projects;
 
-    return resp.send([
-        "Projeto 1",
-        "Projeto 2"
-    ]);
+    return resp.send(result);
 });
 
 app.post('/projects', (request, response) => {
 
-    const body = request.body;
+    const {title, owner} = request.body;
 
-    console.log(body);
+    const project = {id: uuid(), title, owner}
 
-    return response.send([
-        "Projeto 1",
-        "Projeto 2",
-        "Projeto 3"
-    ]);
+    projects.push(project);
+
+    return response.send(project);
 });
 
 app.put('/projects/:id',(request, response) => {
 
-    const params = request.params;
+    const {id} = request.params;
 
-    const body = request.body;
 
-    console.log(params);
+    const projectIndex = projects.findIndex(project => project.id = id);
 
-    console.log(body);
+    if (projectIndex < 0) {
+        return response.send({error: "project not found"}).status(400);
+    }
 
-    return response.send([
-        "Projeto 1",
-        "Projeto 2",
-        "Projeto 3",
-        "Projeto 4",
-    ]);
+    const {title, owner} = request.body;
+
+    const project = {
+        id,
+        title,
+        owner
+    }
+    
+    projects[projectIndex] = project;
+
+    return response.send(project);
 });
 
 app.delete("/projects/:id", (request, response) => {
 
-    const params = request.params;
+    const {id} = request.params;
 
-    console.log(params);
+    const projectIndex = projects.findIndex(p => p.id = id);
+
+    if (projectIndex < 0 ) {
+        return response.send({error: "Project not found!"}).status(400);
+    }
+
+    projects.splice(projectIndex,1)
     
-    return response.send([
-        "Projeto 2",
-        "Projeto 3",
-        "Projeto 4"
-    ]);
+    return response.status(204).send();
 })
 
 app.listen(3001, () => {
