@@ -20,8 +20,6 @@ function validateProjectId(req, resp, next) {
 
 const projects = [];
 
-app.use('/projects/:id', validateProjectId);
-
 app.get('/projects', (req, resp) => {
 
     const { title } = req.query;
@@ -42,7 +40,7 @@ app.post('/projects', (request, response) => {
     return response.send(project);
 });
 
-app.put('/projects/:id',(request, response) => {
+app.put('/projects/:id',validateProjectId,(request, response) => {
 
     const {id} = request.params;
 
